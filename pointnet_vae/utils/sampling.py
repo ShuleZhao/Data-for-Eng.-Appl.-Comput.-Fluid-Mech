@@ -5,8 +5,12 @@ Advanced sampling methods for point clouds
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import Tuple, Optional, List
-import open3d as o3d
+from typing import Tuple, Optional, List, Dict
+try:
+    import open3d as o3d
+    OPEN3D_AVAILABLE = True
+except ImportError:
+    OPEN3D_AVAILABLE = False
 
 
 class FarthestPointSampling:
@@ -223,6 +227,13 @@ class VoxelGridSampling:
     
     def _sample_single(self, points: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """Voxel grid sampling for single point cloud"""
+        if not OPEN3D_AVAILABLE:
+            print("Open3D not available, falling back to random sampling")
+            N, D = points.shape
+            target_size = int(N * 0.8)  # Approximate downsampling
+            indices = torch.randperm(N, device=points.device)[:target_size]
+            return points[indices], indices
+            
         N, D = points.shape
         device = points.device
         

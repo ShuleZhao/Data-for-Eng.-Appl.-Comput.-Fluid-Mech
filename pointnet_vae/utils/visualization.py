@@ -6,7 +6,11 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import seaborn as sns
+try:
+    import seaborn as sns
+    SEABORN_AVAILABLE = True
+except ImportError:
+    SEABORN_AVAILABLE = False
 from typing import Optional, List, Tuple, Union
 import os
 
@@ -30,7 +34,8 @@ class PointCloudVisualizer:
     def __init__(self, figsize: Tuple[int, int] = (12, 8), style: str = 'whitegrid'):
         self.figsize = figsize
         plt.style.use('default')
-        sns.set_style(style)
+        if SEABORN_AVAILABLE:
+            sns.set_style(style)
         
     def plot_point_cloud(self,
                         points: Union[torch.Tensor, np.ndarray],

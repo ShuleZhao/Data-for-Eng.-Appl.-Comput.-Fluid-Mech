@@ -6,7 +6,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
+try:
+    from torch.utils.tensorboard import SummaryWriter
+    TENSORBOARD_AVAILABLE = True
+except ImportError:
+    TENSORBOARD_AVAILABLE = False
+    SummaryWriter = None
 import os
 import time
 import logging
@@ -54,7 +59,7 @@ class PointNetVAETrainer:
         self.setup_augmentation()
         
         # Initialize tensorboard
-        if config.use_tensorboard:
+        if config.use_tensorboard and TENSORBOARD_AVAILABLE:
             self.writer = SummaryWriter(log_dir=os.path.join(config.output_path, 'tensorboard'))
         else:
             self.writer = None
